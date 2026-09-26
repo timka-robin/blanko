@@ -378,6 +378,8 @@ final class Updater {
     }
 
     private func present(title: String, text: String) {
+        DebugLog.write("updater: \(title) — \(text)")
+        guard !isAutomated else { return }
         let alert = NSAlert()
         alert.messageText = title
         alert.informativeText = text
