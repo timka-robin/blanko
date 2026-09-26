@@ -30,14 +30,10 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>202609270030</string>
+	<string>202609270043</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>13.0</string>
 	<key>LSUIElement</key>
-	<true/>
-	<key>NSAppleEventsUsageDescription</key>
-	<string>Нужно, чтобы определять папку, открытую в Finder, и создавать файл именно в ней.</string>
-	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
@@ -52,6 +48,10 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>Нужно, чтобы определять папку, открытую в Finder, и создавать файл именно в ней.</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
 	<key>NSServices</key>
 	<array>
 		<dict>
