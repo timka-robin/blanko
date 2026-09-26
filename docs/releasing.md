@@ -19,21 +19,21 @@ gh auth login            # если ещё не авторизован
 - версия проставится в `Resources/Info-app.plist` и `Resources/Info-appex.plist`
   (`CFBundleShortVersionString` и `CFBundleVersion`);
 - соберётся universal-бандл (arm64 + x86_64) и подпишется ad-hoc;
-- появится `dist/NewFile.app.zip` и его SHA-256;
+- появится `dist/Blanko.app.zip` и его SHA-256;
 - `update.json` с этой версией, ссылкой на ассет и контрольной суммой будет
   закоммичен в ветку `release`;
 - ветки `main` и `release` уедут в GitHub, появится тег `vX.Y.Z`;
-- создастся GitHub Release с приложенным `NewFile.app.zip`.
+- создастся GitHub Release с приложенным `Blanko.app.zip`.
 
 Проверка на другой машине:
 
 ```sh
-curl -L -O https://github.com/timka-robin/newfilemac/releases/latest/download/NewFile.app.zip
-unzip NewFile.app.zip
+curl -L -O https://github.com/timka-robin/newfilemac/releases/latest/download/Blanko.app.zip
+unzip Blanko.app.zip
 ./Установить.command        # или двойной клик по этому файлу
 ```
 
-В архиве лежат `NewFile.app` и `Установить.command`. Приложение специально
+В архиве лежат `Blanko.app` и `Установить.command`. Приложение специально
 остаётся в корне архива — так его находит автообновление.
 
 ## Обновление у пользователей

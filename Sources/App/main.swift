@@ -63,7 +63,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func performService(
-        _ kind: NewFileKind,
+        _ kind: BlankoKind,
         pasteboard: NSPasteboard,
         error: AutoreleasingUnsafeMutablePointer<NSString>
     ) {
@@ -127,7 +127,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
               components.scheme == "newfile-create",
               let kindValue = components.queryItems?.first(where: { $0.name == "kind" })?.value,
-              let kind = NewFileKind(requestValue: kindValue),
+              let kind = BlankoKind(requestValue: kindValue),
               let path = components.queryItems?.first(where: { $0.name == "dir" })?.value
         else {
             DebugLog.write("app: unparsable request")
@@ -156,11 +156,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if let button = item.button {
             let image = NSImage(
                 systemSymbolName: "doc.badge.plus",
-                accessibilityDescription: "Новый файл"
+                accessibilityDescription: "Blanko"
             )
             image?.isTemplate = true
             button.image = image
-            button.toolTip = "Новый файл"
+            button.toolTip = "Blanko"
         }
 
         let menu = NSMenu()
@@ -173,7 +173,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(.separator())
 
         let createSubmenu = NSMenu()
-        for (index, kind) in NewFileKind.allCases.enumerated() {
+        for (index, kind) in BlankoKind.allCases.enumerated() {
             let subItem = NSMenuItem(
                 title: kind.menuTitle,
                 action: #selector(createInFrontFolder(_:)),
@@ -181,7 +181,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             )
             subItem.keyEquivalentModifierMask = [.control, .option, .command]
             subItem.target = self
-            subItem.tag = NewFileKind.allCases.firstIndex(of: kind) ?? 0
+            subItem.tag = BlankoKind.allCases.firstIndex(of: kind) ?? 0
             createSubmenu.addItem(subItem)
         }
         let createItem = NSMenuItem(
@@ -297,7 +297,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func createFromHotKey(index: Int) {
-        let kinds = NewFileKind.allCases
+        let kinds = BlankoKind.allCases
         guard index >= 1, index <= kinds.count else { return }
         createInFrontFolder(kind: kinds[index - 1])
     }
@@ -305,12 +305,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// Menu bar fallback for folders where Finder extensions do not work at all —
     /// iCloud Drive, the synced desktop, Documents, other cloud providers.
     @objc private func createInFrontFolder(_ sender: NSMenuItem) {
-        let kinds = NewFileKind.allCases
+        let kinds = BlankoKind.allCases
         guard sender.tag >= 0, sender.tag < kinds.count else { return }
         createInFrontFolder(kind: kinds[sender.tag])
     }
 
-    private func createInFrontFolder(kind: NewFileKind) {
+    private func createInFrontFolder(kind: BlankoKind) {
         guard let directory = Self.frontFinderFolder() else {
             let alert = NSAlert()
             alert.messageText = "Не удалось определить папку"
@@ -390,7 +390,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             backing: .buffered,
             defer: false
         )
-        window.title = "Новый файл"
+        window.title = "Blanko"
         window.center()
         window.isReleasedWhenClosed = false
 
@@ -401,7 +401,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             wrappingLabelWithString: "Локальные папки: правый клик — три пункта прямо в меню. "
                 + "Любые папки, включая iCloud, рабочий стол и «Документы»: правый клик по папке "
                 + "или файлу → Службы → «Создать …». Пустая iCloud-папка: иконка в строке меню → "
-                + "«Создать в открытой папке Finder». Новый файл сразу выделяется в Finder."
+                + "«Создать в открытой папке Finder». Созданный файл сразу выделяется в Finder."
         )
         hint.textColor = .secondaryLabelColor
         hint.font = .systemFont(ofSize: 12)

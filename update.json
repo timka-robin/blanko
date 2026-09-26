@@ -1,6 +1,6 @@
 {
-  "version": "1.0.1",
-  "url": "https://github.com/timka-robin/newfilemac/releases/download/v1.0.1/NewFile.app.zip",
-  "sha256": "b9c19be0631df710914a3d5c3a23aab494c129cabd7247b5e7461f0384091d56",
-  "notes": "Установщик внутри архива: распаковал и двойной клик. Плюс надёжный поиск бандла при обновлении"
+  "version": "1.1.0",
+  "url": "https://github.com/timka-robin/newfilemac/releases/download/v1.1.0/Blanko.app.zip",
+  "sha256": "101df5613c0df59e604ea4e6c7e69f60dbb0c08bf3c9b13378f64bc024e4fcc0",
+  "notes": "Приложение переименовано в Blanko"
 }

@@ -16,10 +16,10 @@ PUSH=0
 for arg in "$@"; do [[ "$arg" == "--push" ]] && PUSH=1; done
 
 DIST="$ROOT/dist"
-BUILD="${NEWFILE_BUILD_DIR:-${TMPDIR:-/tmp}/newfile-build}"
-APP="$BUILD/NewFile.app"
-ZIP="$DIST/NewFile.app.zip"
-ASSET_URL="https://github.com/$REPO_SLUG/releases/download/v$VERSION/NewFile.app.zip"
+BUILD="${BLANKO_BUILD_DIR:-${TMPDIR:-/tmp}/blanko-build}"
+APP="$BUILD/Blanko.app"
+ZIP="$DIST/Blanko.app.zip"
+ASSET_URL="https://github.com/$REPO_SLUG/releases/download/v$VERSION/Blanko.app.zip"
 
 cd "$ROOT"
 
@@ -35,15 +35,16 @@ echo "== 2/6 build"
 
 echo "== 3/6 package"
 mkdir -p "$DIST"
-STAGE="$DIST/NewFile-$VERSION"
+STAGE="$DIST/Blanko-$VERSION"
 rm -rf "$STAGE"
 mkdir -p "$STAGE"
-ditto "$APP" "$STAGE/NewFile.app"
+ditto "$APP" "$STAGE/Blanko.app"
 cp "$ROOT/scripts/install.command" "$STAGE/Установить.command"
 chmod +x "$STAGE/Установить.command"
 rm -f "$ZIP"
-# zip the *contents* of the staging folder so NewFile.app stays at the archive root
-ditto -c -k --sequesterRsrc "$STAGE" "$ZIP"
+# zip the *contents* of the staging folder so Blanko.app stays at the archive root;
+# plain zip keeps the archive free of __MACOSX noise and keeps the exec bit
+(cd "$STAGE" && zip -qry -y -X "$ZIP" Blanko.app "Установить.command")
 rm -rf "$STAGE"
 SHA="$(shasum -a 256 "$ZIP" | awk '{print $1}')"
 echo "   $ZIP"
