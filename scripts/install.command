@@ -7,7 +7,8 @@ set -e
 HERE="${0:A:h}"
 SOURCE="$HERE/Blanko.app"
 DEST="/Applications/Blanko.app"
-APPEX_ID="com.timurgizatullin.newfile.finder"
+APPEX_ID="com.blanko.mac.finder"
+LEGACY_APPEX_ID="com.timurgizatullin.newfile.finder"
 
 pause() {
     echo
@@ -44,6 +45,7 @@ echo "== регистрирую расширение Finder"
 /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$DEST"
 pluginkit -a "$DEST/Contents/PlugIns/BlankoFinder.appex"
 pluginkit -e use -i "$APPEX_ID"
+pluginkit -e ignore -i "$LEGACY_APPEX_ID" 2>/dev/null || true
 
 echo "== запускаю приложение"
 open -g "$DEST"

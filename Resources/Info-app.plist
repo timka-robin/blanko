@@ -9,7 +9,7 @@
 	<key>CFBundleExecutable</key>
 	<string>Blanko</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.timurgizatullin.newfile</string>
+	<string>com.blanko.mac</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -22,10 +22,10 @@
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>com.timurgizatullin.newfile.create</string>
+			<string>com.blanko.mac.create</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>newfile-create</string>
+				<string>blanko-create</string>
 			</array>
 		</dict>
 	</array>

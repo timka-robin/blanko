@@ -5,7 +5,8 @@ set -euo pipefail
 ROOT="${0:A:h:h}"
 SOURCE="${BLANKO_BUILD_DIR:-${TMPDIR:-/tmp}/blanko-build}/Blanko.app"
 DEST="/Applications/Blanko.app"
-APPEX_ID="com.timurgizatullin.newfile.finder"
+APPEX_ID="com.blanko.mac.finder"
+LEGACY_APPEX_ID="com.timurgizatullin.newfile.finder"
 
 if [[ ! -d "$SOURCE" ]]; then
     echo "error: $SOURCE not found. Run scripts/build.sh first." >&2
@@ -38,6 +39,8 @@ echo "== registering with LaunchServices"
 echo "== registering the Finder extension"
 pluginkit -a "$DEST/Contents/PlugIns/BlankoFinder.appex"
 pluginkit -e use -i "$APPEX_ID"
+# the pre-1.2.0 identity is no longer used
+pluginkit -e ignore -i "$LEGACY_APPEX_ID" 2>/dev/null || true
 
 echo "== launching the app once (required by macOS)"
 open -g "$DEST"

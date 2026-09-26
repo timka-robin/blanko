@@ -268,11 +268,22 @@ final class Updater {
         for candidate in candidates {
             let plistURL = candidate.appendingPathComponent("Contents/Info.plist")
             if let plist = NSDictionary(contentsOf: plistURL),
-               plist["CFBundleIdentifier"] as? String == Bundle.main.bundleIdentifier {
+               let identifier = plist["CFBundleIdentifier"] as? String,
+               acceptedBundleIdentifiers.contains(identifier) {
                 return candidate
             }
         }
         throw updateError("Скачанный архив не похож на Blanko — установка отменена.")
+    }
+
+    /// Identifiers this updater treats as "Blanko": the running one plus ids used
+    /// by older releases, so an update may hand the app a new bundle identity.
+    private var acceptedBundleIdentifiers: Set<String> {
+        var identifiers: Set<String> = ["com.blanko.mac", "com.timurgizatullin.newfile"]
+        if let current = Bundle.main.bundleIdentifier {
+            identifiers.insert(current)
+        }
+        return identifiers
     }
 
     private func installAndRestart(newApp: URL) {
