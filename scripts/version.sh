@@ -9,6 +9,7 @@ ROOT="${0:A:h:h}"
 PB=/usr/libexec/PlistBuddy
 APP_PLIST="$ROOT/Resources/Info-app.plist"
 EXT_PLIST="$ROOT/Resources/Info-appex.plist"
+INSTALLER_PLIST="$ROOT/Resources/Info-installer.plist"
 
 if [[ $# -eq 0 ]]; then
     "$PB" -c "Print :CFBundleShortVersionString" "$APP_PLIST"
@@ -23,7 +24,8 @@ fi
 
 BUILD_NUMBER="$(date +%Y%m%d%H%M)"
 
-for plist in "$APP_PLIST" "$EXT_PLIST"; do
+for plist in "$APP_PLIST" "$EXT_PLIST" "$INSTALLER_PLIST"; do
+    [[ -f "$plist" ]] || continue
     "$PB" -c "Set :CFBundleShortVersionString $VERSION" "$plist"
     "$PB" -c "Set :CFBundleVersion $BUILD_NUMBER" "$plist"
 done
