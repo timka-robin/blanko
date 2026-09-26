@@ -1,6 +1,6 @@
 {
-  "version": "1.1.0",
-  "url": "https://github.com/timka-robin/newfilemac/releases/download/v1.1.0/Blanko.app.zip",
-  "sha256": "101df5613c0df59e604ea4e6c7e69f60dbb0c08bf3c9b13378f64bc024e4fcc0",
-  "notes": "Приложение переименовано в Blanko"
+  "version": "1.1.1",
+  "url": "https://github.com/timka-robin/blanko/releases/download/v1.1.1/Blanko.app.zip",
+  "sha256": "2ed1b1dc31f76e21fd91ab080bf2d94cccc4d681202e5ae1e6894eda4c32bb4e",
+  "notes": "Репозиторий переехал на github.com/timka-robin/blanko"
 }

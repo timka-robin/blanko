@@ -9,7 +9,7 @@
 set -euo pipefail
 
 ROOT="${0:A:h:h}"
-REPO_SLUG="timka-robin/newfilemac"
+REPO_SLUG="timka-robin/blanko"
 VERSION="${1:?usage: scripts/release.sh <version> [notes] [--push]}"
 NOTES="${2:-}"
 PUSH=0
