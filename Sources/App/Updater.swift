@@ -15,9 +15,9 @@ final class Updater {
     static let shared = Updater()
 
     /// Raw files of the release branch, with mirrors in case one host is blocked.
-    /// `NEWFILE_UPDATE_MANIFEST` overrides this (used for testing the update path).
+    /// `BLANKO_UPDATE_MANIFEST` overrides this (used for testing the update path).
     private var manifestURLs: [String] {
-        if let override = ProcessInfo.processInfo.environment["NEWFILE_UPDATE_MANIFEST"],
+        if let override = ProcessInfo.processInfo.environment["BLANKO_UPDATE_MANIFEST"],
            !override.isEmpty {
             return [override]
         }
@@ -30,9 +30,9 @@ final class Updater {
         "https://cdn.jsdelivr.net/gh/timka-robin/newfilemac@release/update.json",
     ]
 
-    /// Skips the confirmation dialogs — `NEWFILE_UPDATE_AUTO=1` for automated checks.
+    /// Skips the confirmation dialogs — `BLANKO_UPDATE_AUTO=1` for automated checks.
     private var isAutomated: Bool {
-        ProcessInfo.processInfo.environment["NEWFILE_UPDATE_AUTO"] == "1"
+        ProcessInfo.processInfo.environment["BLANKO_UPDATE_AUTO"] == "1"
     }
 
     private let lastCheckKey = "lastUpdateCheckDate"
@@ -232,10 +232,10 @@ final class Updater {
         }
 
         let workDir = URL(fileURLWithPath: NSTemporaryDirectory())
-            .appendingPathComponent("NewFileUpdate-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("BlankoUpdate-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: workDir, withIntermediateDirectories: true)
 
-        let archive = workDir.appendingPathComponent("NewFile.app.zip")
+        let archive = workDir.appendingPathComponent("Blanko.app.zip")
         try FileManager.default.moveItem(at: downloaded, to: archive)
         try run("/usr/bin/ditto", ["-x", "-k", archive.path, workDir.path])
 
@@ -244,11 +244,11 @@ final class Updater {
         return newApp
     }
 
-    /// The release archive keeps NewFile.app at the top level; look a level deeper
+    /// The release archive keeps Blanko.app at the top level; look a level deeper
     /// as well so archives with a wrapping folder still install.
     private func locateAppBundle(in directory: URL) throws -> URL {
         let fileManager = FileManager.default
-        var candidates: [URL] = [directory.appendingPathComponent("NewFile.app")]
+        var candidates: [URL] = [directory.appendingPathComponent("Blanko.app")]
 
         if let entries = try? fileManager.contentsOfDirectory(
             at: directory,
@@ -272,7 +272,7 @@ final class Updater {
                 return candidate
             }
         }
-        throw updateError("Скачанный архив не похож на NewFile — установка отменена.")
+        throw updateError("Скачанный архив не похож на Blanko — установка отменена.")
     }
 
     private func installAndRestart(newApp: URL) {
@@ -293,14 +293,22 @@ final class Updater {
                 ofItemAtPath: scriptURL.path
             )
 
+            // Install under the new bundle's own file name: if the app was renamed,
+            // this moves it instead of leaving the old name in place.
+            let currentApp = Bundle.main.bundlePath
+            let installDirectory = (currentApp as NSString).deletingLastPathComponent
+            let targetPath = (installDirectory as NSString)
+                .appendingPathComponent(newApp.lastPathComponent)
+
             let process = Process()
             process.executableURL = URL(fileURLWithPath: "/bin/sh")
             process.arguments = [
                 scriptURL.path,
                 String(ProcessInfo.processInfo.processIdentifier),
-                Bundle.main.bundlePath,
+                currentApp,
                 newApp.path,
                 workDir.path,
+                targetPath,
             ]
             process.standardOutput = FileHandle.nullDevice
             process.standardError = FileHandle.nullDevice
@@ -320,6 +328,7 @@ final class Updater {
         APP="$2"
         NEW="$3"
         WORK="$4"
+        TARGET="$5"
 
         i=0
         while /bin/kill -0 "$PID" 2>/dev/null; do
@@ -328,18 +337,21 @@ final class Updater {
             [ "$i" -gt 150 ] && break
         done
 
-        STAGE="${APP}.new"
         OLD="${APP}.old"
-        /bin/rm -rf "$STAGE" "$OLD"
+        /bin/rm -rf "${TARGET}.new" "$OLD"
 
-        if /usr/bin/ditto "$NEW" "$STAGE"; then
-            /usr/bin/xattr -cr "$STAGE"
+        if /usr/bin/ditto "$NEW" "${TARGET}.new"; then
+            /usr/bin/xattr -cr "${TARGET}.new"
+            [ "$TARGET" != "$APP" ] && /bin/rm -rf "$TARGET"
             if /bin/mv "$APP" "$OLD" 2>/dev/null; then
-                /bin/mv "$STAGE" "$APP"
+                /bin/mv "${TARGET}.new" "$TARGET"
                 /bin/rm -rf "$OLD"
             else
-                /bin/rm -rf "$STAGE"
+                /bin/rm -rf "${TARGET}.new"
             fi
+            /usr/bin/open "$TARGET"
+        else
+            /bin/rm -rf "${TARGET}.new"
             /usr/bin/open "$APP"
         fi
 
@@ -362,7 +374,7 @@ final class Updater {
     }
 
     private func updateError(_ message: String) -> Error {
-        NSError(domain: "NewFileUpdater", code: 1, userInfo: [NSLocalizedDescriptionKey: message])
+        NSError(domain: "BlankoUpdater", code: 1, userInfo: [NSLocalizedDescriptionKey: message])
     }
 
     private func present(title: String, text: String) {

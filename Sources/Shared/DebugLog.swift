@@ -9,7 +9,7 @@ enum DebugLog {
             .urls(for: .applicationSupportDirectory, in: .userDomainMask)
             .first
             ?? URL(fileURLWithPath: NSTemporaryDirectory())
-        let directory = base.appendingPathComponent("NewFileDebug", isDirectory: true)
+        let directory = base.appendingPathComponent("BlankoDebug", isDirectory: true)
         try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         return directory.appendingPathComponent("extension.log")
     }()

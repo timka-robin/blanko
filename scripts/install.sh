@@ -1,10 +1,10 @@
 #!/bin/zsh
-# Installs NewFile.app into /Applications and enables the Finder extension.
+# Installs Blanko.app into /Applications and enables the Finder extension.
 set -euo pipefail
 
 ROOT="${0:A:h:h}"
-SOURCE="${NEWFILE_BUILD_DIR:-${TMPDIR:-/tmp}/newfile-build}/NewFile.app"
-DEST="/Applications/NewFile.app"
+SOURCE="${BLANKO_BUILD_DIR:-${TMPDIR:-/tmp}/blanko-build}/Blanko.app"
+DEST="/Applications/Blanko.app"
 APPEX_ID="com.timurgizatullin.newfile.finder"
 
 if [[ ! -d "$SOURCE" ]]; then
@@ -13,8 +13,18 @@ if [[ ! -d "$SOURCE" ]]; then
 fi
 
 # Replacing a running copy: quit it first, otherwise the swap can fail.
-pkill -f "$DEST/Contents/MacOS/NewFile" 2>/dev/null || true
-pkill -f "$DEST/Contents/PlugIns/NewFileFinder.appex/Contents/MacOS/NewFileFinder" 2>/dev/null || true
+pkill -f "$DEST/Contents/MacOS/Blanko" 2>/dev/null || true
+pkill -f "$DEST/Contents/PlugIns/BlankoFinder.appex/Contents/MacOS/BlankoFinder" 2>/dev/null || true
+
+# Drop a copy installed under the pre-rename name, so two builds never coexist.
+LEGACY="/Applications/NewFile.app"
+if [[ -d "$LEGACY" ]]; then
+    echo "== removing the legacy copy at $LEGACY"
+    pkill -f "$LEGACY/Contents/MacOS/NewFile" 2>/dev/null || true
+    pluginkit -r "$LEGACY/Contents/PlugIns/NewFileFinder.appex" 2>/dev/null || true
+    rm -rf "$LEGACY"
+fi
+
 sleep 1
 
 echo "== installing to $DEST"
@@ -26,7 +36,7 @@ echo "== registering with LaunchServices"
 /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$DEST"
 
 echo "== registering the Finder extension"
-pluginkit -a "$DEST/Contents/PlugIns/NewFileFinder.appex"
+pluginkit -a "$DEST/Contents/PlugIns/BlankoFinder.appex"
 pluginkit -e use -i "$APPEX_ID"
 
 echo "== launching the app once (required by macOS)"

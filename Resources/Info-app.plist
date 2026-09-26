@@ -5,15 +5,15 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>ru</string>
 	<key>CFBundleDisplayName</key>
-	<string>Новый файл</string>
+	<string>Blanko</string>
 	<key>CFBundleExecutable</key>
-	<string>NewFile</string>
+	<string>Blanko</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.timurgizatullin.newfile</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>NewFile</string>
+	<string>Blanko</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -63,7 +63,7 @@
 			<key>NSMessage</key>
 			<string>createTextDocument</string>
 			<key>NSPortName</key>
-			<string>NewFile</string>
+			<string>Blanko</string>
 			<key>NSRequiredContext</key>
 			<dict>
 				<key>NSApplicationIdentifier</key>
@@ -86,7 +86,7 @@
 			<key>NSMessage</key>
 			<string>createWordDocument</string>
 			<key>NSPortName</key>
-			<string>NewFile</string>
+			<string>Blanko</string>
 			<key>NSRequiredContext</key>
 			<dict>
 				<key>NSApplicationIdentifier</key>
@@ -109,7 +109,7 @@
 			<key>NSMessage</key>
 			<string>createExcelWorkbook</string>
 			<key>NSPortName</key>
-			<string>NewFile</string>
+			<string>Blanko</string>
 			<key>NSRequiredContext</key>
 			<dict>
 				<key>NSApplicationIdentifier</key>

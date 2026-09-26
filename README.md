@@ -1,7 +1,11 @@
-# NewFile for macOS
+# Blanko for macOS
 
 Небольшое приложение, которое возвращает в Finder создание файлов: текстовый
 документ, документ Word и таблицу Excel — прямо из контекстного меню.
+
+Проект раньше назывался NewFile. Идентификаторы бандла (`com.timurgizatullin.newfile`
+и `com.timurgizatullin.newfile.finder`) оставлены прежними — так уже включённое
+расширение Finder и автообновление продолжают работать без переустановки.
 
 ## Что умеет
 
@@ -14,26 +18,23 @@
   проверять обновления, включать автозапуск и открывать настройки.
 - Файлы `.docx` и `.xlsx` — настоящие форматы Office (Open XML), Word и Excel их открывают.
 - Имена не конфликтуют: `Новый текстовый документ.txt`, `… 2.txt`, `… 3.txt`.
-- Новый файл сразу выделяется в Finder, чтобы его можно было переименовать.
+- Созданный файл сразу выделяется в Finder, чтобы его можно было переименовать.
 - Поддержка **Apple silicon и Intel** (universal binary, macOS 13+).
 - **Автообновление** из релизной ветки (см. «Обновления»).
 
 ## Установка
 
-```sh
-curl -L -o NewFile.app.zip https://github.com/timka-robin/newfilemac/releases/latest/download/NewFile.app.zip
-unzip -q NewFile.app.zip
-cd newfilemac 2>/dev/null || true
-./scripts/install.sh
-```
+1. Скачать архив последнего релиза:
+   <https://github.com/timka-robin/newfilemac/releases/latest/download/Blanko.app.zip>
+2. Распаковать и дважды щёлкнуть по «Установить.command» — он скопирует
+   приложение в `/Applications`, снимет карантин, зарегистрирует и включит
+   расширение Finder.
 
-Скачать архив последнего релиза, распаковать и дважды щёлкнуть по
-«Установить.command» — он скопирует приложение в `/Applications`, снимет
-карантин, зарегистрирует и включит расширение Finder. То же самое из терминала:
+То же самое из терминала:
 
 ```sh
-curl -L -O https://github.com/timka-robin/newfilemac/releases/latest/download/NewFile.app.zip
-unzip -q NewFile.app.zip
+curl -L -O https://github.com/timka-robin/newfilemac/releases/latest/download/Blanko.app.zip
+unzip -q Blanko.app.zip
 ./Установить.command
 ```
 
@@ -58,7 +59,7 @@ Developer ID, нотаризации нет — это разовое дейст
 ARCHS=arm64 ./scripts/build.sh   # или только один архитектурный срез
 ```
 
-Сборка идёт в `$TMPDIR/newfile-build` — вне iCloud, иначе синхронизация добавляет
+Сборка идёт в `$TMPDIR/blanko-build` — вне iCloud, иначе синхронизация добавляет
 атрибуты Finder, из-за которых `codesign` отказывается подписывать бандл.
 
 ## Ветки и разработка
@@ -81,7 +82,7 @@ ARCHS=arm64 ./scripts/build.sh   # или только один архитект
 
 1. проставляет версию в `Resources/Info-app.plist` и `Info-appex.plist`;
 2. собирает universal-приложение и подписывает;
-3. пакует `dist/NewFile.app.zip` и считает SHA-256;
+3. пакует `dist/Blanko.app.zip` и считает SHA-256;
 4. пишет `update.json` (версия, ссылка на ассет последнего релиза, контрольная сумма);
 5. коммитит версию в `main`, переносит изменения в `release`, коммитит манифест;
 6. ставит тег `vX.Y.Z`, отправляет ветки и тег в GitHub;
@@ -100,7 +101,7 @@ ARCHS=arm64 ./scripts/build.sh   # или только один архитект
 
 Если версия новее, приложение спрашивает подтверждение, скачивает архив с
 GitHub Release, сверяет SHA-256 с манифестом, распаковывает, проверяет
-идентификатор бандла и подменяет `/Applications/NewFile.app` через отдельный
+идентификатор бандла и подменяет `/Applications/Blanko.app` через отдельный
 скрипт (он ждёт выхода приложения, кладёт старую версию рядом как `.old` и
 перезапускает новую). Проверка обновлений работает только для копии в
 `/Applications` — сборки из репозитория не обновляются.

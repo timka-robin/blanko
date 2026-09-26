@@ -1,6 +1,6 @@
 import Foundation
 
-enum NewFileKind: CaseIterable {
+enum BlankoKind: CaseIterable {
     case text
     case word
     case excel
@@ -59,14 +59,14 @@ enum FileCreator {
     /// Creates a new file of the given kind in `directory` and returns its URL.
     /// Existing files are never overwritten: names get a numeric suffix instead.
     @discardableResult
-    static func create(_ kind: NewFileKind, in directory: URL) throws -> URL {
+    static func create(_ kind: BlankoKind, in directory: URL) throws -> URL {
         let target = uniqueURL(base: kind.baseName, ext: kind.fileExtension, in: directory)
         do {
             try kind.contents.write(to: target, options: .withoutOverwriting)
         } catch {
             DebugLog.write("write to \(target.path) failed: \(error)")
             throw NSError(
-                domain: "NewFile",
+                domain: "Blanko",
                 code: 1,
                 userInfo: [
                     NSLocalizedDescriptionKey:

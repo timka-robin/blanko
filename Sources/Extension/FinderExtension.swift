@@ -1,13 +1,13 @@
 import AppKit
 import FinderSync
 
-@objc(NewFileFinderExtension)
-final class NewFileFinderExtension: FIFinderSync {
+@objc(BlankoFinderExtension)
+final class BlankoFinderExtension: FIFinderSync {
     override init() {
         super.init()
         let controller = FIFinderSyncController.default()
         var roots: Set<URL> = [URL(fileURLWithPath: "/")]
-        if let home = NewFileFinderExtension.realHomeDirectory {
+        if let home = BlankoFinderExtension.realHomeDirectory {
             roots.insert(home)
         }
         if let volumes = try? FileManager.default.contentsOfDirectory(
@@ -29,21 +29,21 @@ final class NewFileFinderExtension: FIFinderSync {
         DebugLog.write("menu request: kind=\(menuKind.rawValue) "
             + "target=\(FIFinderSyncController.default().targetedURL()?.path ?? "nil")")
         let menu = NSMenu(title: "")
-        for kind in NewFileKind.allCases {
+        for kind in BlankoKind.allCases {
             let item = NSMenuItem(
                 title: kind.menuTitle,
                 action: #selector(createFile(_:)),
                 keyEquivalent: ""
             )
             item.target = self
-            item.tag = NewFileKind.allCases.firstIndex(of: kind) ?? 0
+            item.tag = BlankoKind.allCases.firstIndex(of: kind) ?? 0
             menu.addItem(item)
         }
         return menu
     }
 
     @objc private func createFile(_ sender: NSMenuItem) {
-        let kinds = NewFileKind.allCases
+        let kinds = BlankoKind.allCases
         guard sender.tag >= 0, sender.tag < kinds.count else { return }
         let kind = kinds[sender.tag]
         let directory = destinationDirectory()
@@ -62,7 +62,7 @@ final class NewFileFinderExtension: FIFinderSync {
         delegateToHostApp(kind: kind, directory: directory)
     }
 
-    private func delegateToHostApp(kind: NewFileKind, directory: URL) {
+    private func delegateToHostApp(kind: BlankoKind, directory: URL) {
         var components = URLComponents()
         components.scheme = "newfile-create"
         components.host = "create"

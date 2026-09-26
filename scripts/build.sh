@@ -1,5 +1,5 @@
 #!/bin/zsh
-# Builds NewFile.app (menu bar app + Finder Sync extension) for Intel and Apple silicon.
+# Builds Blanko.app (menu bar app + Finder Sync extension) for Intel and Apple silicon.
 # Needs only the Command Line Tools — no Xcode.
 #
 #   scripts/build.sh                  # universal (arm64 + x86_64)
@@ -8,9 +8,9 @@
 set -euo pipefail
 
 ROOT="${0:A:h:h}"
-BUILD="${NEWFILE_BUILD_DIR:-${TMPDIR:-/tmp}/newfile-build}"
-APP="$BUILD/NewFile.app"
-APPEX="$APP/Contents/PlugIns/NewFileFinder.appex"
+BUILD="${BLANKO_BUILD_DIR:-${TMPDIR:-/tmp}/blanko-build}"
+APP="$BUILD/Blanko.app"
+APPEX="$APP/Contents/PlugIns/BlankoFinder.appex"
 MODCACHE="$BUILD/.modulecache"
 ARCHS="${ARCHS:-arm64 x86_64}"
 MIN_MACOS="${MIN_MACOS:-13.0}"
@@ -58,7 +58,7 @@ for arch in ${=ARCHS}; do
     echo "== compiling $arch"
 
     xcrun swiftc -c -sdk "$SDK" -target "$target" -module-cache-path "$MODCACHE" -O \
-        -whole-module-optimization -parse-as-library -module-name NewFileFinder \
+        -whole-module-optimization -parse-as-library -module-name BlankoFinder \
         "${EXT_SOURCES[@]}" \
         -o "$BUILD/finder-$arch.o"
 
@@ -71,7 +71,7 @@ for arch in ${=ARCHS}; do
     arch_binaries_finder+=("$BUILD/finder-$arch")
 
     xcrun swiftc -sdk "$SDK" -target "$target" -module-cache-path "$MODCACHE" -O \
-        -module-name NewFile "${APP_SOURCES[@]}" \
+        -module-name Blanko "${APP_SOURCES[@]}" \
         -framework AppKit -framework FinderSync -framework ServiceManagement \
         -o "$BUILD/app-$arch"
     arch_binaries_app+=("$BUILD/app-$arch")
@@ -79,14 +79,14 @@ done
 
 echo "== linking universal binaries"
 if (( ${#arch_binaries_finder[@]} > 1 )); then
-    lipo -create -output "$APPEX/Contents/MacOS/NewFileFinder" "${arch_binaries_finder[@]}"
-    lipo -create -output "$APP/Contents/MacOS/NewFile" "${arch_binaries_app[@]}"
+    lipo -create -output "$APPEX/Contents/MacOS/BlankoFinder" "${arch_binaries_finder[@]}"
+    lipo -create -output "$APP/Contents/MacOS/Blanko" "${arch_binaries_app[@]}"
 else
-    cp "${arch_binaries_finder[1]}" "$APPEX/Contents/MacOS/NewFileFinder"
-    cp "${arch_binaries_app[1]}" "$APP/Contents/MacOS/NewFile"
+    cp "${arch_binaries_finder[1]}" "$APPEX/Contents/MacOS/BlankoFinder"
+    cp "${arch_binaries_app[1]}" "$APP/Contents/MacOS/Blanko"
 fi
-lipo -info "$APP/Contents/MacOS/NewFile"
-lipo -info "$APPEX/Contents/MacOS/NewFileFinder"
+lipo -info "$APP/Contents/MacOS/Blanko"
+lipo -info "$APPEX/Contents/MacOS/BlankoFinder"
 
 cp "$ROOT/Resources/Info-app.plist" "$APP/Contents/Info.plist"
 cp "$ROOT/Resources/Info-appex.plist" "$APPEX/Contents/Info.plist"
@@ -95,7 +95,7 @@ echo "== version $(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString
 echo "== signing (identity: $IDENTITY)"
 xattr -cr "$APP"
 codesign --force --sign "$IDENTITY" --timestamp=none \
-    --entitlements "$ROOT/Resources/NewFileFinder.entitlements" "$APPEX"
+    --entitlements "$ROOT/Resources/BlankoFinder.entitlements" "$APPEX"
 # iCloud/Finder can re-add FinderInfo attributes between the two signing steps.
 xattr -cr "$APP"
 codesign --force --sign "$IDENTITY" --timestamp=none "$APP"

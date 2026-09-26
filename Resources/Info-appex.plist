@@ -5,15 +5,15 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>ru</string>
 	<key>CFBundleDisplayName</key>
-	<string>Новый файл</string>
+	<string>Blanko</string>
 	<key>CFBundleExecutable</key>
-	<string>NewFileFinder</string>
+	<string>BlankoFinder</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.timurgizatullin.newfile.finder</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>NewFileFinder</string>
+	<string>BlankoFinder</string>
 	<key>CFBundlePackageType</key>
 	<string>XPC!</string>
 	<key>CFBundleShortVersionString</key>
@@ -35,7 +35,7 @@
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.FinderSync</string>
 		<key>NSExtensionPrincipalClass</key>
-		<string>NewFileFinderExtension</string>
+		<string>BlankoFinderExtension</string>
 	</dict>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
