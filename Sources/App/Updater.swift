@@ -239,15 +239,40 @@ final class Updater {
         try FileManager.default.moveItem(at: downloaded, to: archive)
         try run("/usr/bin/ditto", ["-x", "-k", archive.path, workDir.path])
 
-        let newApp = workDir.appendingPathComponent("NewFile.app")
-        let plistURL = newApp.appendingPathComponent("Contents/Info.plist")
-        guard let plist = NSDictionary(contentsOf: plistURL),
-              plist["CFBundleIdentifier"] as? String == Bundle.main.bundleIdentifier
-        else {
-            throw updateError("Скачанный архив не похож на NewFile — установка отменена.")
-        }
+        let newApp = try locateAppBundle(in: workDir)
         DebugLog.write("updater: verified \(newApp.path)")
         return newApp
+    }
+
+    /// The release archive keeps NewFile.app at the top level; look a level deeper
+    /// as well so archives with a wrapping folder still install.
+    private func locateAppBundle(in directory: URL) throws -> URL {
+        let fileManager = FileManager.default
+        var candidates: [URL] = [directory.appendingPathComponent("NewFile.app")]
+
+        if let entries = try? fileManager.contentsOfDirectory(
+            at: directory,
+            includingPropertiesForKeys: nil
+        ) {
+            for entry in entries where entry.pathExtension == "app" {
+                candidates.append(entry)
+                if let inner = try? fileManager.contentsOfDirectory(
+                    at: entry,
+                    includingPropertiesForKeys: nil
+                ) {
+                    candidates.append(contentsOf: inner.filter { $0.pathExtension == "app" })
+                }
+            }
+        }
+
+        for candidate in candidates {
+            let plistURL = candidate.appendingPathComponent("Contents/Info.plist")
+            if let plist = NSDictionary(contentsOf: plistURL),
+               plist["CFBundleIdentifier"] as? String == Bundle.main.bundleIdentifier {
+                return candidate
+            }
+        }
+        throw updateError("Скачанный архив не похож на NewFile — установка отменена.")
     }
 
     private func installAndRestart(newApp: URL) {
