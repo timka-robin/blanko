@@ -29,6 +29,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         buildStatusItem()
         registerHotKeys()
         Updater.shared.scheduleAutomaticCheck()
+        if CommandLine.arguments.contains("--check-updates") {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                Updater.shared.checkInteractively()
+            }
+        }
     }
 
     // MARK: - Finder Services (work in iCloud / File Provider folders too)

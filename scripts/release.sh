@@ -56,13 +56,16 @@ echo "== 5/6 commits"
 git add Resources/Info-app.plist Resources/Info-appex.plist
 git commit -m "Bump version to $VERSION" || echo "   (nothing to commit)"
 
+# The manifest lives on main; the release branch always mirrors main, so users
+# updating from `release` see exactly the released tree.
+git add update.json
+git commit -m "Release $VERSION" || echo "   (nothing to commit)"
+
 if ! git rev-parse --verify --quiet release >/dev/null; then
     git branch release
 fi
 git checkout release
-git merge --ff-only "$(git rev-parse --abbrev-ref @{-1})" || git merge --no-edit "$(git rev-parse --abbrev-ref @{-1})"
-git add update.json
-git commit -m "Release $VERSION" || echo "   (nothing to commit)"
+git merge --no-edit main
 git tag -f "v$VERSION"
 git checkout -
 
