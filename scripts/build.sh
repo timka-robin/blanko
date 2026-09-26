@@ -11,6 +11,7 @@ ROOT="${0:A:h:h}"
 BUILD="${BLANKO_BUILD_DIR:-${TMPDIR:-/tmp}/blanko-build}"
 APP="$BUILD/Blanko.app"
 APPEX="$APP/Contents/PlugIns/BlankoFinder.appex"
+INSTALLER="$BUILD/Установить Blanko.app"
 MODCACHE="$BUILD/.modulecache"
 ARCHS="${ARCHS:-arm64 x86_64}"
 MIN_MACOS="${MIN_MACOS:-13.0}"
@@ -33,6 +34,7 @@ EXT_SOURCES=(
     "$ROOT/Sources/Shared/FileTemplates.swift"
     "$ROOT/Sources/Shared/DebugLog.swift"
     "$ROOT/Sources/Shared/FileCreator.swift"
+    "$ROOT/Sources/Shared/FileIcons.swift"
     "$ROOT/Sources/Extension/FinderExtension.swift"
 )
 APP_SOURCES=(
@@ -42,6 +44,7 @@ APP_SOURCES=(
     "$ROOT/Sources/Shared/FileTemplates.swift"
     "$ROOT/Sources/Shared/DebugLog.swift"
     "$ROOT/Sources/Shared/FileCreator.swift"
+    "$ROOT/Sources/Shared/FileIcons.swift"
 )
 
 echo "== SDK: $SDK"
@@ -49,9 +52,11 @@ echo "== architectures: $ARCHS (min macOS $MIN_MACOS)"
 
 rm -rf "$BUILD"
 mkdir -p "$APP/Contents/MacOS" "$APPEX/Contents/MacOS" "$MODCACHE"
+mkdir -p "$APP/Contents/Resources" "$INSTALLER/Contents/MacOS" "$INSTALLER/Contents/Resources"
 
 arch_binaries_finder=()
 arch_binaries_app=()
+arch_binaries_installer=()
 
 for arch in ${=ARCHS}; do
     target="$arch-apple-macosx$MIN_MACOS"
@@ -75,21 +80,30 @@ for arch in ${=ARCHS}; do
         -framework AppKit -framework FinderSync -framework ServiceManagement \
         -o "$BUILD/app-$arch"
     arch_binaries_app+=("$BUILD/app-$arch")
+
+    xcrun swiftc -sdk "$SDK" -target "$target" -module-cache-path "$MODCACHE" -O \
+        -module-name BlankoInstaller "$ROOT/Sources/Installer/main.swift" \
+        -framework AppKit \
+        -o "$BUILD/installer-$arch"
+    arch_binaries_installer+=("$BUILD/installer-$arch")
 done
 
 echo "== linking universal binaries"
 if (( ${#arch_binaries_finder[@]} > 1 )); then
     lipo -create -output "$APPEX/Contents/MacOS/BlankoFinder" "${arch_binaries_finder[@]}"
     lipo -create -output "$APP/Contents/MacOS/Blanko" "${arch_binaries_app[@]}"
+    lipo -create -output "$INSTALLER/Contents/MacOS/BlankoInstaller" "${arch_binaries_installer[@]}"
 else
     cp "${arch_binaries_finder[1]}" "$APPEX/Contents/MacOS/BlankoFinder"
     cp "${arch_binaries_app[1]}" "$APP/Contents/MacOS/Blanko"
+    cp "${arch_binaries_installer[1]}" "$INSTALLER/Contents/MacOS/BlankoInstaller"
 fi
 lipo -info "$APP/Contents/MacOS/Blanko"
 lipo -info "$APPEX/Contents/MacOS/BlankoFinder"
 
 cp "$ROOT/Resources/Info-app.plist" "$APP/Contents/Info.plist"
 cp "$ROOT/Resources/Info-appex.plist" "$APPEX/Contents/Info.plist"
+cp "$ROOT/Resources/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns"
 echo "== version $(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP/Contents/Info.plist")"
 
 echo "== signing (identity: $IDENTITY)"
@@ -101,4 +115,15 @@ xattr -cr "$APP"
 codesign --force --sign "$IDENTITY" --timestamp=none "$APP"
 codesign --verify --deep --strict "$APP"
 
+echo "== assembling installer app"
+cp "$ROOT/Resources/Info-installer.plist" "$INSTALLER/Contents/Info.plist"
+cp "$ROOT/Resources/AppIcon.icns" "$INSTALLER/Contents/Resources/AppIcon.icns"
+cp "$ROOT/scripts/install.sh" "$INSTALLER/Contents/Resources/install.sh"
+ditto "$APP" "$INSTALLER/Contents/Resources/Blanko.app"
+lipo -info "$INSTALLER/Contents/MacOS/BlankoInstaller"
+xattr -cr "$INSTALLER"
+codesign --force --sign "$IDENTITY" --timestamp=none "$INSTALLER"
+codesign --verify --deep --strict "$INSTALLER"
+
 echo "== built: $APP"
+echo "== built: $INSTALLER"

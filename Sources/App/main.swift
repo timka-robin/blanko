@@ -34,6 +34,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 Updater.shared.checkInteractively()
             }
         }
+        if CommandLine.arguments.contains("--show-window") {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { self.showWindow() }
+        }
     }
 
     // MARK: - Finder Services (work in iCloud / File Provider folders too)
@@ -181,6 +184,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             )
             subItem.keyEquivalentModifierMask = [.control, .option, .command]
             subItem.target = self
+            subItem.image = kind.systemIcon()
             subItem.tag = BlankoKind.allCases.firstIndex(of: kind) ?? 0
             createSubmenu.addItem(subItem)
         }
@@ -304,6 +308,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     /// Menu bar fallback for folders where Finder extensions do not work at all —
     /// iCloud Drive, the synced desktop, Documents, other cloud providers.
+    @objc private func createFromWindow(_ sender: NSButton) {
+        let kinds = BlankoKind.allCases
+        guard sender.tag >= 0, sender.tag < kinds.count else { return }
+        createInFrontFolder(kind: kinds[sender.tag])
+    }
+
     @objc private func createInFrontFolder(_ sender: NSMenuItem) {
         let kinds = BlankoKind.allCases
         guard sender.tag >= 0, sender.tag < kinds.count else { return }
@@ -385,7 +395,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func buildWindow() {
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 480, height: 250),
+            contentRect: NSRect(x: 0, y: 0, width: 480, height: 400),
             styleMask: [.titled, .closable],
             backing: .buffered,
             defer: false
@@ -426,9 +436,43 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         buttonRow.orientation = .horizontal
         buttonRow.spacing = 8
 
+        let hotkeyTitles = ["⌃⌥⌘1", "⌃⌥⌘2", "⌃⌥⌘3"]
+        var documentRows: [NSView] = []
+        for (index, kind) in BlankoKind.allCases.enumerated() {
+            let createButton = NSButton(
+                title: kind.menuTitle,
+                target: self,
+                action: #selector(createFromWindow(_:))
+            )
+            createButton.tag = index
+            createButton.image = kind.systemIcon()
+            createButton.imagePosition = .imageLeading
+            createButton.bezelStyle = .rounded
+            createButton.translatesAutoresizingMaskIntoConstraints = false
+            createButton.widthAnchor.constraint(equalToConstant: 330).isActive = true
+
+            let hotkey = NSTextField(labelWithString: hotkeyTitles[index])
+            hotkey.font = .monospacedDigitSystemFont(ofSize: 12, weight: .regular)
+            hotkey.textColor = .tertiaryLabelColor
+            hotkey.alignment = .right
+            hotkey.translatesAutoresizingMaskIntoConstraints = false
+            hotkey.widthAnchor.constraint(equalToConstant: 64).isActive = true
+
+            let row = NSStackView(views: [createButton, hotkey])
+            row.orientation = .horizontal
+            row.spacing = 8
+            row.alignment = .centerY
+            documentRows.append(row)
+        }
+        let documentsStack = NSStackView(views: documentRows)
+        documentsStack.orientation = .vertical
+        documentsStack.alignment = .leading
+        documentsStack.spacing = 6
+
         let stack = NSStackView(views: [
             title,
             hint,
+            documentsStack,
             statusLabel,
             launchAtLoginToggle,
             buttonRow,

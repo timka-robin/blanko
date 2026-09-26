@@ -2,8 +2,9 @@
 # Installs Blanko.app into /Applications and enables the Finder extension.
 set -euo pipefail
 
-ROOT="${0:A:h:h}"
-SOURCE="${BLANKO_BUILD_DIR:-${TMPDIR:-/tmp}/blanko-build}/Blanko.app"
+# Optional first argument: path to the Blanko.app to install (the installer app
+# inside the DMG passes its own bundled copy here).
+SOURCE="${1:-${BLANKO_BUILD_DIR:-${TMPDIR:-/tmp}/blanko-build}/Blanko.app}"
 DEST="/Applications/Blanko.app"
 APPEX_ID="com.blanko.mac.finder"
 LEGACY_APPEX_ID="com.timurgizatullin.newfile.finder"

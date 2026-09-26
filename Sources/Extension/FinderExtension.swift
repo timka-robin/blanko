@@ -36,6 +36,7 @@ final class BlankoFinderExtension: FIFinderSync {
                 keyEquivalent: ""
             )
             item.target = self
+            item.image = kind.systemIcon()
             item.tag = BlankoKind.allCases.firstIndex(of: kind) ?? 0
             menu.addItem(item)
         }

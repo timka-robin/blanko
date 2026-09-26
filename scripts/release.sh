@@ -50,6 +50,11 @@ SHA="$(shasum -a 256 "$ZIP" | awk '{print $1}')"
 echo "   $ZIP"
 echo "   sha256 $SHA"
 
+echo "== 3b/6 disk image"
+./scripts/make-dmg.sh
+DMG="$DIST/Blanko-$VERSION.dmg"
+echo "   $DMG"
+
 echo "== 4/6 manifest"
 /usr/bin/python3 - "$ROOT/update.json" "$VERSION" "$ASSET_URL" "$SHA" "$NOTES" <<'PY'
 import json, sys
@@ -62,7 +67,7 @@ print(open(path).read().strip())
 PY
 
 echo "== 5/6 commits"
-git add Resources/Info-app.plist Resources/Info-appex.plist
+git add Resources/Info-app.plist Resources/Info-appex.plist Resources/Info-installer.plist
 git commit -m "Bump version to $VERSION" || echo "   (nothing to commit)"
 
 # The manifest lives on main; the release branch always mirrors main, so users
@@ -83,7 +88,7 @@ if (( PUSH )); then
     git push origin main
     git push origin release
     git push origin "v$VERSION" --force
-    gh release create "v$VERSION" "$ZIP" \
+    gh release create "v$VERSION" "$ZIP" "$DMG" \
         --repo "$REPO_SLUG" \
         --title "v$VERSION" \
         --notes "${NOTES:-Release $VERSION}"
@@ -91,5 +96,6 @@ if (( PUSH )); then
 else
     echo "== local only (no --push). Artefacts:"
     echo "   $ZIP"
+    echo "   $DMG"
     echo "   $ROOT/update.json (committed on the release branch)"
 fi
