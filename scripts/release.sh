@@ -42,8 +42,9 @@ ditto "$APP" "$STAGE/NewFile.app"
 cp "$ROOT/scripts/install.command" "$STAGE/Установить.command"
 chmod +x "$STAGE/Установить.command"
 rm -f "$ZIP"
-# zip the *contents* of the staging folder so NewFile.app stays at the archive root
-ditto -c -k --sequesterRsrc "$STAGE" "$ZIP"
+# zip the *contents* of the staging folder so NewFile.app stays at the archive root;
+# plain zip keeps the archive free of __MACOSX noise and keeps the exec bit
+(cd "$STAGE" && zip -qry -y -X "$ZIP" NewFile.app "Установить.command")
 rm -rf "$STAGE"
 SHA="$(shasum -a 256 "$ZIP" | awk '{print $1}')"
 echo "   $ZIP"
