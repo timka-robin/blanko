@@ -35,8 +35,16 @@ echo "== 2/6 build"
 
 echo "== 3/6 package"
 mkdir -p "$DIST"
+STAGE="$DIST/NewFile-$VERSION"
+rm -rf "$STAGE"
+mkdir -p "$STAGE"
+ditto "$APP" "$STAGE/NewFile.app"
+cp "$ROOT/scripts/install.command" "$STAGE/Установить.command"
+chmod +x "$STAGE/Установить.command"
 rm -f "$ZIP"
-ditto -c -k --sequesterRsrc --keepParent "$APP" "$ZIP"
+# zip the *contents* of the staging folder so NewFile.app stays at the archive root
+ditto -c -k --sequesterRsrc "$STAGE" "$ZIP"
+rm -rf "$STAGE"
 SHA="$(shasum -a 256 "$ZIP" | awk '{print $1}')"
 echo "   $ZIP"
 echo "   sha256 $SHA"
@@ -65,7 +73,7 @@ if ! git rev-parse --verify --quiet release >/dev/null; then
     git branch release
 fi
 git checkout release
-git merge --no-edit main
+git merge --no-edit -X theirs main
 git tag -f "v$VERSION"
 git checkout -
 

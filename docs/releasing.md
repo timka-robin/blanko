@@ -29,8 +29,12 @@ gh auth login            # если ещё не авторизован
 
 ```sh
 curl -L -O https://github.com/timka-robin/newfilemac/releases/latest/download/NewFile.app.zip
-unzip NewFile.app.zip && ./scripts/install.sh
+unzip NewFile.app.zip
+./Установить.command        # или двойной клик по этому файлу
 ```
+
+В архиве лежат `NewFile.app` и `Установить.command`. Приложение специально
+остаётся в корне архива — так его находит автообновление.
 
 ## Обновление у пользователей
 
