@@ -15,11 +15,25 @@ final class Updater {
     static let shared = Updater()
 
     /// Raw files of the release branch, with mirrors in case one host is blocked.
-    private let manifestURLs = [
+    /// `NEWFILE_UPDATE_MANIFEST` overrides this (used for testing the update path).
+    private var manifestURLs: [String] {
+        if let override = ProcessInfo.processInfo.environment["NEWFILE_UPDATE_MANIFEST"],
+           !override.isEmpty {
+            return [override]
+        }
+        return defaultManifestURLs
+    }
+
+    private let defaultManifestURLs = [
         "https://raw.githubusercontent.com/timka-robin/newfilemac/release/update.json",
         "https://github.com/timka-robin/newfilemac/raw/release/update.json",
         "https://cdn.jsdelivr.net/gh/timka-robin/newfilemac@release/update.json",
     ]
+
+    /// Skips the confirmation dialogs — `NEWFILE_UPDATE_AUTO=1` for automated checks.
+    private var isAutomated: Bool {
+        ProcessInfo.processInfo.environment["NEWFILE_UPDATE_AUTO"] == "1"
+    }
 
     private let lastCheckKey = "lastUpdateCheckDate"
     private var isChecking = false
@@ -112,7 +126,16 @@ final class Updater {
             request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
             request.timeoutInterval = 20
 
-            URLSession.shared.dataTask(with: request) { data, _, _ in
+            DebugLog.write("updater: trying \(url.absoluteString)")
+            URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error {
+                    let nsError = error as NSError
+                    DebugLog.write("updater: \(url.host ?? "?") failed "
+                        + "\(nsError.domain)/\(nsError.code) \(error.localizedDescription)")
+                } else if let http = response as? HTTPURLResponse, http.statusCode != 200 {
+                    DebugLog.write("updater: \(url.host ?? "?") HTTP \(http.statusCode)")
+                }
+
                 if let data,
                    let manifest = try? JSONDecoder().decode(UpdateManifest.self, from: data),
                    !manifest.version.isEmpty,
@@ -141,6 +164,11 @@ final class Updater {
     // MARK: - Installing
 
     private func offer(_ manifest: UpdateManifest) {
+        if isAutomated {
+            DebugLog.write("updater: automatic mode, installing \(manifest.version)")
+            download(manifest)
+            return
+        }
         let alert = NSAlert()
         alert.messageText = "Доступна версия \(manifest.version)"
         var text = "Установлена версия \(currentVersion).\n\n"
@@ -162,6 +190,16 @@ final class Updater {
         }
 
         DebugLog.write("updater: downloading \(manifest.url)")
+        if url.isFileURL {
+            do {
+                let newApp = try unpackAndVerify(manifest: manifest, downloaded: url)
+                installAndRestart(newApp: newApp)
+            } catch {
+                present(title: "Ошибка обновления", text: error.localizedDescription)
+            }
+            return
+        }
+
         URLSession.shared.downloadTask(with: url) { [weak self] location, _, error in
             guard let self else { return }
             guard let location, error == nil else {
@@ -213,11 +251,13 @@ final class Updater {
     }
 
     private func installAndRestart(newApp: URL) {
-        let alert = NSAlert()
-        alert.messageText = "Обновление готово"
-        alert.informativeText = "Приложение сейчас перезапустится, чтобы применить обновление."
-        alert.addButton(withTitle: "Перезапустить")
-        alert.runModal()
+        if !isAutomated {
+            let alert = NSAlert()
+            alert.messageText = "Обновление готово"
+            alert.informativeText = "Приложение сейчас перезапустится, чтобы применить обновление."
+            alert.addButton(withTitle: "Перезапустить")
+            alert.runModal()
+        }
 
         let workDir = newApp.deletingLastPathComponent()
         let scriptURL = workDir.appendingPathComponent("install-update.sh")
