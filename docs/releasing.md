@@ -28,7 +28,7 @@ gh auth login            # если ещё не авторизован
 Проверка на другой машине:
 
 ```sh
-curl -L -O https://github.com/timka-robin/newfilemac/releases/latest/download/Blanko.app.zip
+curl -L -O https://github.com/timka-robin/blanko/releases/latest/download/Blanko.app.zip
 unzip Blanko.app.zip
 ./Установить.command        # или двойной клик по этому файлу
 ```

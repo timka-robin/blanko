@@ -25,9 +25,9 @@ final class Updater {
     }
 
     private let defaultManifestURLs = [
-        "https://raw.githubusercontent.com/timka-robin/newfilemac/release/update.json",
-        "https://github.com/timka-robin/newfilemac/raw/release/update.json",
-        "https://cdn.jsdelivr.net/gh/timka-robin/newfilemac@release/update.json",
+        "https://raw.githubusercontent.com/timka-robin/blanko/release/update.json",
+        "https://github.com/timka-robin/blanko/raw/release/update.json",
+        "https://cdn.jsdelivr.net/gh/timka-robin/blanko@release/update.json",
     ]
 
     /// Skips the confirmation dialogs — `BLANKO_UPDATE_AUTO=1` for automated checks.

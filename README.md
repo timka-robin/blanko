@@ -25,7 +25,7 @@
 ## Установка
 
 1. Скачать архив последнего релиза:
-   <https://github.com/timka-robin/newfilemac/releases/latest/download/Blanko.app.zip>
+   <https://github.com/timka-robin/blanko/releases/latest/download/Blanko.app.zip>
 2. Распаковать и дважды щёлкнуть по «Установить.command» — он скопирует
    приложение в `/Applications`, снимет карантин, зарегистрирует и включит
    расширение Finder.
@@ -33,7 +33,7 @@
 То же самое из терминала:
 
 ```sh
-curl -L -O https://github.com/timka-robin/newfilemac/releases/latest/download/Blanko.app.zip
+curl -L -O https://github.com/timka-robin/blanko/releases/latest/download/Blanko.app.zip
 unzip -q Blanko.app.zip
 ./Установить.command
 ```
