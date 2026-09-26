@@ -9,7 +9,7 @@
 	<key>CFBundleExecutable</key>
 	<string>BlankoFinder</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.timurgizatullin.newfile.finder</string>
+	<string>com.blanko.mac.finder</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -17,13 +17,13 @@
 	<key>CFBundlePackageType</key>
 	<string>XPC!</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.1.1</string>
+	<string>1.2.0</string>
 	<key>CFBundleSupportedPlatforms</key>
 	<array>
 		<string>MacOSX</string>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>202609270151</string>
+	<string>202609270202</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>13.0</string>
 	<key>LSUIElement</key>

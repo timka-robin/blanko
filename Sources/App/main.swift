@@ -125,7 +125,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func handle(request url: URL) {
         DebugLog.write("app: request \(url.absoluteString)")
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
-              components.scheme == "newfile-create",
+              components.scheme == "blanko-create",
               let kindValue = components.queryItems?.first(where: { $0.name == "kind" })?.value,
               let kind = BlankoKind(requestValue: kindValue),
               let path = components.queryItems?.first(where: { $0.name == "dir" })?.value

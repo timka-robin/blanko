@@ -64,7 +64,7 @@ final class BlankoFinderExtension: FIFinderSync {
 
     private func delegateToHostApp(kind: BlankoKind, directory: URL) {
         var components = URLComponents()
-        components.scheme = "newfile-create"
+        components.scheme = "blanko-create"
         components.host = "create"
         components.queryItems = [
             URLQueryItem(name: "kind", value: kind.requestValue),
@@ -81,7 +81,7 @@ final class BlankoFinderExtension: FIFinderSync {
         configuration.createsNewApplicationInstance = false
 
         guard let appURL = NSWorkspace.shared.urlForApplication(
-            withBundleIdentifier: "com.timurgizatullin.newfile"
+            withBundleIdentifier: "com.blanko.mac"
         ) else {
             DebugLog.write("delegation failed: host app not found")
             NSWorkspace.shared.open(requestURL)

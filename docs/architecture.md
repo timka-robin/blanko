@@ -22,7 +22,7 @@ Finder Sync расширения (`com.apple.FinderSync`) — единствен
 | `BlankoFinder.appex` | расширение Finder: пункты меню в локальных папках |
 
 Расширение получает клик, но записать файл не может, поэтому передаёт запрос
-приложению через URL-схему `newfile-create://create?kind=…&dir=…`.
+приложению через URL-схему `blanko-create://create?kind=…&dir=…`.
 
 ## Службы Finder
 

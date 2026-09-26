@@ -4,9 +4,11 @@ set -euo pipefail
 
 DEST="/Applications/Blanko.app"
 LEGACY="/Applications/NewFile.app"
-APPEX_ID="com.timurgizatullin.newfile.finder"
+APPEX_ID="com.blanko.mac.finder"
+LEGACY_APPEX_ID="com.timurgizatullin.newfile.finder"
 
 pluginkit -r "$DEST/Contents/PlugIns/BlankoFinder.appex" 2>/dev/null || true
+pluginkit -e ignore -i "$LEGACY_APPEX_ID" 2>/dev/null || true
 pkill -f "$DEST/Contents/MacOS/Blanko" 2>/dev/null || true
 rm -rf "$DEST"
 

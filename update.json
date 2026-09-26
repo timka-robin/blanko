@@ -1,6 +1,6 @@
 {
-  "version": "1.1.1",
-  "url": "https://github.com/timka-robin/blanko/releases/download/v1.1.1/Blanko.app.zip",
-  "sha256": "2ed1b1dc31f76e21fd91ab080bf2d94cccc4d681202e5ae1e6894eda4c32bb4e",
-  "notes": "Репозиторий переехал на github.com/timka-robin/blanko"
+  "version": "1.2.0",
+  "url": "https://github.com/timka-robin/blanko/releases/download/v1.2.0/Blanko.app.zip",
+  "sha256": "f8517631cb50a7147b69211c27d283ddb55354071eb618e1e7adf8e2e7994238",
+  "notes": "Идентификаторы бандлов теперь com.blanko.mac — без личного имени. Нужна одна ручная переустановка"
 }
