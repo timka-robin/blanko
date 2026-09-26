@@ -67,7 +67,7 @@ print(open(path).read().strip())
 PY
 
 echo "== 5/6 commits"
-git add Resources/Info-app.plist Resources/Info-appex.plist
+git add Resources/Info-app.plist Resources/Info-appex.plist Resources/Info-installer.plist
 git commit -m "Bump version to $VERSION" || echo "   (nothing to commit)"
 
 # The manifest lives on main; the release branch always mirrors main, so users
