@@ -46,4 +46,14 @@ hdiutil convert "$RW" -format UDZO -o "$DMG" -quiet
 rm -f "$RW"
 rm -rf "$STAGE"
 
+echo "== attaching the icon to the image file itself"
+ICON_WORK="$BUILD/dmg-icon"
+rm -f "$ICON_WORK.icns" "$ICON_WORK.rsrc"
+cp "$ROOT/Resources/AppIcon.icns" "$ICON_WORK.icns"
+sips -i "$ICON_WORK.icns" >/dev/null
+DeRez -only icns "$ICON_WORK.icns" > "$ICON_WORK.rsrc"
+Rez -append "$ICON_WORK.rsrc" -o "$DMG"
+SetFile -a C "$DMG"
+rm -f "$ICON_WORK.icns" "$ICON_WORK.rsrc"
+
 echo "== built: $DMG"
