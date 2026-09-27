@@ -54,6 +54,12 @@ echo "== 3b/6 disk image"
 ./scripts/make-dmg.sh
 DMG="$DIST/Blanko-$VERSION.dmg"
 echo "   $DMG"
+# A .dmg keeps its custom icon only while its file attributes travel with it;
+# a ditto-made zip carries them along, so a downloaded copy still looks right.
+DMGZIP="$DIST/Blanko-$VERSION.dmg.zip"
+rm -f "$DMGZIP"
+(cd "$DIST" && ditto -c -k --sequesterRsrc "Blanko-$VERSION.dmg" "$DMGZIP")
+echo "   $DMGZIP"
 
 echo "== 4/6 manifest"
 /usr/bin/python3 - "$ROOT/update.json" "$VERSION" "$ASSET_URL" "$SHA" "$NOTES" <<'PY'
@@ -88,7 +94,7 @@ if (( PUSH )); then
     git push origin main
     git push origin release
     git push origin "v$VERSION" --force
-    gh release create "v$VERSION" "$ZIP" "$DMG" \
+    gh release create "v$VERSION" "$ZIP" "$DMG" "$DMGZIP" \
         --repo "$REPO_SLUG" \
         --title "v$VERSION" \
         --notes "${NOTES:-Release $VERSION}"
@@ -97,5 +103,6 @@ else
     echo "== local only (no --push). Artefacts:"
     echo "   $ZIP"
     echo "   $DMG"
+    echo "   $DMGZIP"
     echo "   $ROOT/update.json (committed on the release branch)"
 fi
