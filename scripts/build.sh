@@ -139,6 +139,11 @@ cp "$ROOT/scripts/install.sh" "$INSTALLER/Contents/Resources/install.sh"
 for lproj in "$ROOT/Resources/strings/"*.lproj; do
     cp -R "$lproj" "$INSTALLER/Contents/Resources/${lproj:t}"
 done
+for lproj in "$ROOT/Resources/installer/"*.lproj; do
+    name="${lproj:t}"
+    mkdir -p "$INSTALLER/Contents/Resources/$name"
+    cp "$lproj/InfoPlist.strings" "$INSTALLER/Contents/Resources/$name/InfoPlist.strings"
+done
 ditto "$APP" "$INSTALLER/Contents/Resources/Blanko.app"
 lipo -info "$INSTALLER/Contents/MacOS/BlankoInstaller"
 xattr -cr "$INSTALLER"
