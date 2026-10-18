@@ -2,5 +2,5 @@
   "version": "1.4.1",
   "url": "https://github.com/timka-robin/blanko/releases/download/v1.4.1/Blanko.app.zip",
   "sha256": "c907b397e42d43b6fb3664cd5cd3f43f499e79e136b9adee4dbe8d920fc86d79",
-  "notes": "The installer name now follows the system language."
+  "notes": "The app, installer and Finder services now support 19 languages, and the installer name follows the system language."
 }
