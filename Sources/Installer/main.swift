@@ -4,10 +4,10 @@ import AppKit
 /// install script against the bundled copy of Blanko and reports the result.
 final class InstallerDelegate: NSObject, NSApplicationDelegate {
     private var window: NSWindow?
-    private let statusLabel = NSTextField(labelWithString: "Готов к установке")
+    private let statusLabel = NSTextField(labelWithString: L("inst_ready"))
     private let logView = NSTextView()
     private let spinner = NSProgressIndicator()
-    private let actionButton = NSButton(title: "Установить", target: nil, action: nil)
+    private let actionButton = NSButton(title: L("inst_install"), target: nil, action: nil)
     private var isInstalling = false
     private var isFinished = false
 
@@ -27,7 +27,7 @@ final class InstallerDelegate: NSObject, NSApplicationDelegate {
         let appMenuItem = NSMenuItem()
         let appMenu = NSMenu()
         appMenu.addItem(
-            withTitle: "Завершить",
+            withTitle: L("app_quit"),
             action: #selector(NSApplication.terminate(_:)),
             keyEquivalent: "q"
         )
@@ -43,7 +43,7 @@ final class InstallerDelegate: NSObject, NSApplicationDelegate {
             backing: .buffered,
             defer: false
         )
-        window.title = "Установить Blanko"
+        window.title = L("inst_title")
         window.center()
         window.isReleasedWhenClosed = false
 
@@ -56,7 +56,7 @@ final class InstallerDelegate: NSObject, NSApplicationDelegate {
 
         let title = NSTextField(labelWithString: "Blanko")
         title.font = .systemFont(ofSize: 22, weight: .semibold)
-        let subtitle = NSTextField(labelWithString: "Создание файлов прямо из меню Finder")
+        let subtitle = NSTextField(labelWithString: L("inst_subtitle"))
         subtitle.textColor = .secondaryLabelColor
         subtitle.font = .systemFont(ofSize: 12)
         let headline = NSStackView(views: [title, subtitle])
@@ -69,11 +69,7 @@ final class InstallerDelegate: NSObject, NSApplicationDelegate {
         header.spacing = 14
         header.alignment = .centerY
 
-        let explanation = NSTextField(
-            wrappingLabelWithString: "Установщик скопирует Blanko в «Программы», снимет карантин, "
-                + "зарегистрирует и включит расширение Finder, а затем запустит приложение. "
-                + "Пароль администратора не нужен."
-        )
+        let explanation = NSTextField(wrappingLabelWithString: L("inst_explanation"))
         explanation.textColor = .secondaryLabelColor
         explanation.font = .systemFont(ofSize: 12)
         explanation.preferredMaxLayoutWidth = 500
@@ -108,7 +104,7 @@ final class InstallerDelegate: NSObject, NSApplicationDelegate {
         actionButton.keyEquivalent = "\r"
         actionButton.bezelStyle = .rounded
 
-        let quitButton = NSButton(title: "Закрыть", target: self, action: #selector(closeWindow))
+        let quitButton = NSButton(title: L("inst_close"), target: self, action: #selector(closeWindow))
         quitButton.bezelStyle = .rounded
 
         let buttonRow = NSStackView(views: [quitButton, actionButton])
@@ -164,14 +160,14 @@ final class InstallerDelegate: NSObject, NSApplicationDelegate {
         let script = resources.appendingPathComponent("install.sh")
         guard FileManager.default.fileExists(atPath: payload.path),
               FileManager.default.fileExists(atPath: script.path) else {
-            append("Внутри установщика нет Blanko.app или install.sh — похоже, архив повреждён.")
+            append(L("inst_missing"))
             return
         }
 
         isInstalling = true
         actionButton.isEnabled = false
         spinner.startAnimation(nil)
-        statusLabel.stringValue = "Устанавливаю…"
+        statusLabel.stringValue = L("inst_installing")
         append("$ install.sh \(payload.path)\n")
 
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
@@ -194,7 +190,9 @@ final class InstallerDelegate: NSObject, NSApplicationDelegate {
                 failed = process.terminationStatus != 0
             } catch {
                 failed = true
-                DispatchQueue.main.async { self?.append("Ошибка запуска: \(error.localizedDescription)\n") }
+                DispatchQueue.main.async {
+                    self?.append(L("inst_run_error", error.localizedDescription) + "\n")
+                }
             }
             pipe.fileHandleForReading.readabilityHandler = nil
 
@@ -204,9 +202,9 @@ final class InstallerDelegate: NSObject, NSApplicationDelegate {
                 self.isFinished = !failed
                 self.spinner.stopAnimation(nil)
                 self.statusLabel.stringValue = failed
-                    ? "Установка не удалась — смотри журнал ниже"
-                    : "Готово: Blanko установлен и запущен"
-                self.actionButton.title = failed ? "Повторить" : "Закрыть"
+                    ? L("inst_failed")
+                    : L("inst_done")
+                self.actionButton.title = failed ? L("inst_retry") : L("inst_close")
                 self.actionButton.isEnabled = true
             }
         }

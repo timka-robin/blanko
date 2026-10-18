@@ -7,17 +7,17 @@ enum BlankoKind: CaseIterable {
 
     var menuTitle: String {
         switch self {
-        case .text: return "Создать текстовый документ"
-        case .word: return "Создать документ Word"
-        case .excel: return "Создать таблицу Excel"
+        case .text: return L("action_text")
+        case .word: return L("action_word")
+        case .excel: return L("action_excel")
         }
     }
 
     var baseName: String {
         switch self {
-        case .text: return "Новый текстовый документ"
-        case .word: return "Новый документ Word"
-        case .excel: return "Новая таблица Excel"
+        case .text: return L("file_text")
+        case .word: return L("file_word")
+        case .excel: return L("file_excel")
         }
     }
 
@@ -70,7 +70,7 @@ enum FileCreator {
                 code: 1,
                 userInfo: [
                     NSLocalizedDescriptionKey:
-                        "Не удалось создать файл в \(directory.path): \(error.localizedDescription)"
+                        L("err_create_path", directory.path, error.localizedDescription)
                 ]
             )
         }

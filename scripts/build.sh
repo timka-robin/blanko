@@ -33,6 +33,7 @@ EXT_SOURCES=(
     "$ROOT/Sources/Shared/ZipWriter.swift"
     "$ROOT/Sources/Shared/FileTemplates.swift"
     "$ROOT/Sources/Shared/DebugLog.swift"
+    "$ROOT/Sources/Shared/L10n.swift"
     "$ROOT/Sources/Shared/FileCreator.swift"
     "$ROOT/Sources/Shared/FileIcons.swift"
     "$ROOT/Sources/Extension/FinderExtension.swift"
@@ -43,12 +44,16 @@ APP_SOURCES=(
     "$ROOT/Sources/Shared/ZipWriter.swift"
     "$ROOT/Sources/Shared/FileTemplates.swift"
     "$ROOT/Sources/Shared/DebugLog.swift"
+    "$ROOT/Sources/Shared/L10n.swift"
     "$ROOT/Sources/Shared/FileCreator.swift"
     "$ROOT/Sources/Shared/FileIcons.swift"
 )
 
 echo "== SDK: $SDK"
 echo "== architectures: $ARCHS (min macOS $MIN_MACOS)"
+
+echo "== checking localizations"
+/usr/bin/python3 "$ROOT/tools/check-strings.py"
 
 rm -rf "$BUILD"
 mkdir -p "$APP/Contents/MacOS" "$APPEX/Contents/MacOS" "$MODCACHE"
@@ -82,7 +87,8 @@ for arch in ${=ARCHS}; do
     arch_binaries_app+=("$BUILD/app-$arch")
 
     xcrun swiftc -sdk "$SDK" -target "$target" -module-cache-path "$MODCACHE" -O \
-        -module-name BlankoInstaller "$ROOT/Sources/Installer/main.swift" \
+        -module-name BlankoInstaller \
+        "$ROOT/Sources/Installer/main.swift" "$ROOT/Sources/Shared/L10n.swift" \
         -framework AppKit \
         -o "$BUILD/installer-$arch"
     arch_binaries_installer+=("$BUILD/installer-$arch")
@@ -104,6 +110,17 @@ lipo -info "$APPEX/Contents/MacOS/BlankoFinder"
 cp "$ROOT/Resources/Info-app.plist" "$APP/Contents/Info.plist"
 cp "$ROOT/Resources/Info-appex.plist" "$APPEX/Contents/Info.plist"
 cp "$ROOT/Resources/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns"
+echo "== localizing services"
+/usr/bin/python3 "$ROOT/tools/localize-plist.py" "$APP/Contents/Info.plist" "$ROOT"
+
+echo "== copying localizations"
+for lproj in "$ROOT/Resources/strings/"*.lproj; do
+    name="${lproj:t}"
+    mkdir -p "$APP/Contents/Resources" "$APPEX/Contents/Resources"
+    cp -R "$lproj" "$APP/Contents/Resources/$name"
+    cp -R "$lproj" "$APPEX/Contents/Resources/$name"
+done
+echo "   $(ls -d "$ROOT/Resources/strings/"*.lproj | wc -l | tr -d ' ') languages"
 echo "== version $(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP/Contents/Info.plist")"
 
 echo "== signing (identity: $IDENTITY)"
@@ -119,6 +136,9 @@ echo "== assembling installer app"
 cp "$ROOT/Resources/Info-installer.plist" "$INSTALLER/Contents/Info.plist"
 cp "$ROOT/Resources/AppIcon.icns" "$INSTALLER/Contents/Resources/AppIcon.icns"
 cp "$ROOT/scripts/install.sh" "$INSTALLER/Contents/Resources/install.sh"
+for lproj in "$ROOT/Resources/strings/"*.lproj; do
+    cp -R "$lproj" "$INSTALLER/Contents/Resources/${lproj:t}"
+done
 ditto "$APP" "$INSTALLER/Contents/Resources/Blanko.app"
 lipo -info "$INSTALLER/Contents/MacOS/BlankoInstaller"
 xattr -cr "$INSTALLER"

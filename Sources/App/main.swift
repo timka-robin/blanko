@@ -14,7 +14,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var hotKeyRefs: [EventHotKeyRef?] = []
 
     private let launchAtLoginToggle = NSButton(
-        checkboxWithTitle: "Запускать при входе в систему",
+        checkboxWithTitle: L("ui_launch_at_login"),
         target: nil,
         action: nil
     )
@@ -77,7 +77,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Finder hands over nothing, so ask Finder for the folder in focus instead.
         guard let directory = Self.destination(for: urls) ?? Self.frontFinderFolder() else {
             DebugLog.write("service: could not determine destination folder")
-            error.pointee = "Не удалось определить папку. Попробуй выбрать папку в Finder." as NSString
+            error.pointee = L("err_service_folder") as NSString
             return
         }
 
@@ -145,7 +145,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         } catch {
             DebugLog.write("app: failed \(error.localizedDescription)")
             let alert = NSAlert()
-            alert.messageText = "Не удалось создать файл"
+            alert.messageText = L("err_create")
             alert.informativeText = error.localizedDescription
             alert.alertStyle = .warning
             alert.runModal()
@@ -189,7 +189,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             createSubmenu.addItem(subItem)
         }
         let createItem = NSMenuItem(
-            title: "Создать в открытой папке Finder",
+            title: L("mb_create_here"),
             action: nil,
             keyEquivalent: ""
         )
@@ -200,7 +200,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(.separator())
 
         let settings = NSMenuItem(
-            title: "Настройки…",
+            title: L("mb_settings"),
             action: #selector(showWindow),
             keyEquivalent: ""
         )
@@ -208,7 +208,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(settings)
 
         let autoStart = NSMenuItem(
-            title: "Запускать при входе",
+            title: L("mb_launch"),
             action: #selector(toggleLaunchAtLoginFromMenu),
             keyEquivalent: ""
         )
@@ -219,7 +219,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(.separator())
 
         let versionItem = NSMenuItem(
-            title: "Версия \(Updater.shared.currentVersion)",
+            title: L("mb_version", Updater.shared.currentVersion),
             action: nil,
             keyEquivalent: ""
         )
@@ -227,7 +227,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(versionItem)
 
         let updatesItem = NSMenuItem(
-            title: "Проверить обновления…",
+            title: L("mb_updates"),
             action: #selector(checkForUpdates),
             keyEquivalent: ""
         )
@@ -237,7 +237,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(.separator())
 
         let quit = NSMenuItem(
-            title: "Выход",
+            title: L("mb_quit"),
             action: #selector(NSApplication.terminate(_:)),
             keyEquivalent: "q"
         )
@@ -323,9 +323,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func createInFrontFolder(kind: BlankoKind) {
         guard let directory = Self.frontFinderFolder() else {
             let alert = NSAlert()
-            alert.messageText = "Не удалось определить папку"
-            alert.informativeText = "Открой нужную папку в Finder и разреши приложению "
-                + "управлять Finder, когда система об этом спросит."
+            alert.messageText = L("err_folder")
+            alert.informativeText = L("err_folder_hint")
             alert.alertStyle = .warning
             alert.runModal()
             return
@@ -338,7 +337,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         } catch let failure {
             DebugLog.write("menu bar: failed \(failure.localizedDescription)")
             let alert = NSAlert()
-            alert.messageText = "Не удалось создать файл"
+            alert.messageText = L("err_create")
             alert.informativeText = failure.localizedDescription
             alert.alertStyle = .warning
             alert.runModal()
@@ -368,13 +367,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let appMenuItem = NSMenuItem()
         let appMenu = NSMenu()
         appMenu.addItem(
-            withTitle: "Скрыть",
+            withTitle: L("app_hide"),
             action: #selector(NSApplication.hide(_:)),
             keyEquivalent: "h"
         )
         appMenu.addItem(.separator())
         appMenu.addItem(
-            withTitle: "Завершить",
+            withTitle: L("app_quit"),
             action: #selector(NSApplication.terminate(_:)),
             keyEquivalent: "q"
         )
@@ -404,27 +403,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         window.center()
         window.isReleasedWhenClosed = false
 
-        let title = NSTextField(labelWithString: "Создание файлов в контекстном меню Finder")
+        let title = NSTextField(labelWithString: L("win_title"))
         title.font = .systemFont(ofSize: 15, weight: .semibold)
 
-        let hint = NSTextField(
-            wrappingLabelWithString: "Локальные папки: правый клик — три пункта прямо в меню. "
-                + "Любые папки, включая iCloud, рабочий стол и «Документы»: правый клик по папке "
-                + "или файлу → Службы → «Создать …». Пустая iCloud-папка: иконка в строке меню → "
-                + "«Создать в открытой папке Finder». Созданный файл сразу выделяется в Finder."
-        )
+        let hint = NSTextField(wrappingLabelWithString: L("win_hint"))
         hint.textColor = .secondaryLabelColor
         hint.font = .systemFont(ofSize: 12)
 
         statusLabel.font = .systemFont(ofSize: 13)
 
         let enableButton = NSButton(
-            title: "Настройки расширений",
+            title: L("ui_extension_settings"),
             target: self,
             action: #selector(openExtensionSettings)
         )
         let refreshButton = NSButton(
-            title: "Проверить",
+            title: L("ui_check"),
             target: self,
             action: #selector(refresh)
         )
@@ -500,13 +494,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func refresh() {
         let enabled = FIFinderSyncController.isExtensionEnabled
         statusLabel.stringValue = enabled
-            ? "Расширение включено — пункты уже доступны в Finder."
-            : "Расширение выключено — включи его в системных настройках."
+            ? L("status_enabled")
+            : L("status_disabled")
         statusLabel.textColor = enabled ? .systemGreen : .systemOrange
 
         let loginEnabled = SMAppService.mainApp.status == .enabled
         launchAtLoginToggle.state = loginEnabled ? .on : .off
-        statusMenuItem?.title = enabled ? "Расширение включено" : "Расширение выключено"
+        statusMenuItem?.title = enabled ? L("status_enabled_short") : L("status_disabled_short")
         launchAtLoginMenuItem?.state = loginEnabled ? .on : .off
     }
 
@@ -553,9 +547,9 @@ extension AppDelegate: NSMenuDelegate {
         guard menu == statusItem?.menu else { return }
         refresh()
         if let folder = AppDelegate.frontFinderFolder() {
-            createSubmenuItem?.title = "Создать в папке «\(folder.lastPathComponent)»"
+            createSubmenuItem?.title = L("mb_create_in", folder.lastPathComponent)
         } else {
-            createSubmenuItem?.title = "Создать в открытой папке Finder"
+            createSubmenuItem?.title = L("mb_create_here")
         }
     }
 }
