@@ -7,6 +7,7 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 FILES = sorted((ROOT / "Resources" / "strings").glob("*.lproj/Localizable.strings"))
+INSTALLER_ROOT = ROOT / "Resources" / "installer"
 KEY_PATTERN = re.compile(r'^\s*"((?:[^"\\]|\\.)*)"\s*=\s*"', re.MULTILINE)
 
 
@@ -30,9 +31,22 @@ def main() -> int:
             language = path.parent.name.removesuffix(".lproj")
             print(f"{language}: missing {missing} extra {extra}", file=sys.stderr)
 
+    for path in FILES:
+        language = path.parent.name.removesuffix(".lproj")
+        info = INSTALLER_ROOT / f"{language}.lproj" / "InfoPlist.strings"
+        if not info.exists():
+            failed = True
+            print(f"{language}: installer InfoPlist.strings is missing", file=sys.stderr)
+            continue
+        keys = keys_of(info)
+        for key in ("CFBundleDisplayName", "CFBundleName"):
+            if key not in keys:
+                failed = True
+                print(f"{language}: installer InfoPlist.strings has no {key}", file=sys.stderr)
+
     if failed:
         return 1
-    print(f"{len(FILES)} languages, {len(reference)} keys each")
+    print(f"{len(FILES)} languages, {len(reference)} keys each, installer names localized")
     return 0
 
 
