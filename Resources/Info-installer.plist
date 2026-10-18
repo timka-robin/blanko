@@ -3,7 +3,29 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>ru</string>
+	<string>en</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>ru</string>
+		<string>de</string>
+		<string>fr</string>
+		<string>es</string>
+		<string>it</string>
+		<string>pt-BR</string>
+		<string>ja</string>
+		<string>zh-Hans</string>
+		<string>ko</string>
+		<string>nl</string>
+		<string>pl</string>
+		<string>tr</string>
+		<string>uk</string>
+		<string>cs</string>
+		<string>sv</string>
+		<string>da</string>
+		<string>nb</string>
+		<string>fi</string>
+	</array>
 	<key>CFBundleDisplayName</key>
 	<string>Установить Blanko</string>
 	<key>CFBundleExecutable</key>

@@ -80,8 +80,8 @@ final class Updater {
                     DebugLog.write("updater: manifest unavailable")
                     if userInitiated {
                         self.present(
-                            title: "Не удалось проверить обновления",
-                            text: "Нет связи с GitHub. Попробуй позже."
+                            title: L("upd_check_failed"),
+                            text: L("upd_no_link")
                         )
                     }
                     return
@@ -92,8 +92,8 @@ final class Updater {
                     self.offer(manifest)
                 } else if userInitiated {
                     self.present(
-                        title: "Обновлений нет",
-                        text: "Установлена последняя версия (\(self.currentVersion))."
+                        title: L("upd_none"),
+                        text: L("upd_latest", self.currentVersion)
                     )
                 }
             }
@@ -170,22 +170,22 @@ final class Updater {
             return
         }
         let alert = NSAlert()
-        alert.messageText = "Доступна версия \(manifest.version)"
-        var text = "Установлена версия \(currentVersion).\n\n"
+        alert.messageText = L("upd_available", manifest.version)
+        var text = L("upd_current", currentVersion) + "\n\n"
         if let notes = manifest.notes, !notes.isEmpty {
             text += notes + "\n\n"
         }
-        text += "Скачать и установить обновление?"
+        text += L("upd_ask")
         alert.informativeText = text
-        alert.addButton(withTitle: "Обновить")
-        alert.addButton(withTitle: "Позже")
+        alert.addButton(withTitle: L("upd_install"))
+        alert.addButton(withTitle: L("upd_later"))
         guard alert.runModal() == .alertFirstButtonReturn else { return }
         download(manifest)
     }
 
     private func download(_ manifest: UpdateManifest) {
         guard let url = URL(string: manifest.url) else {
-            present(title: "Ошибка обновления", text: "В манифесте некорректная ссылка.")
+            present(title: L("upd_error"), text: L("upd_bad_manifest"))
             return
         }
 
@@ -195,7 +195,7 @@ final class Updater {
                 let newApp = try unpackAndVerify(manifest: manifest, downloaded: url)
                 installAndRestart(newApp: newApp)
             } catch {
-                present(title: "Ошибка обновления", text: error.localizedDescription)
+                present(title: L("upd_error"), text: error.localizedDescription)
             }
             return
         }
@@ -205,8 +205,8 @@ final class Updater {
             guard let location, error == nil else {
                 DispatchQueue.main.async {
                     self.present(
-                        title: "Ошибка обновления",
-                        text: "Не удалось скачать архив: \(error?.localizedDescription ?? "неизвестная ошибка")"
+                        title: L("upd_error"),
+                        text: L("upd_download_failed", error?.localizedDescription ?? L("upd_unknown_error"))
                     )
                 }
                 return
@@ -218,7 +218,7 @@ final class Updater {
             } catch {
                 DebugLog.write("updater: \(error.localizedDescription)")
                 DispatchQueue.main.async {
-                    self.present(title: "Ошибка обновления", text: error.localizedDescription)
+                    self.present(title: L("upd_error"), text: error.localizedDescription)
                 }
             }
         }.resume()
@@ -228,7 +228,7 @@ final class Updater {
         let data = try Data(contentsOf: downloaded)
         let digest = SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
         guard digest.lowercased() == manifest.sha256.lowercased() else {
-            throw updateError("Контрольная сумма не совпала — обновление отклонено.")
+            throw updateError(L("upd_checksum"))
         }
 
         let workDir = URL(fileURLWithPath: NSTemporaryDirectory())
@@ -273,7 +273,7 @@ final class Updater {
                 return candidate
             }
         }
-        throw updateError("Скачанный архив не похож на Blanko — установка отменена.")
+        throw updateError(L("upd_wrong_bundle"))
     }
 
     /// Identifiers this updater treats as "Blanko": the running one plus ids used
@@ -289,9 +289,9 @@ final class Updater {
     private func installAndRestart(newApp: URL) {
         if !isAutomated {
             let alert = NSAlert()
-            alert.messageText = "Обновление готово"
-            alert.informativeText = "Приложение сейчас перезапустится, чтобы применить обновление."
-            alert.addButton(withTitle: "Перезапустить")
+            alert.messageText = L("upd_ready")
+            alert.informativeText = L("upd_restart_hint")
+            alert.addButton(withTitle: L("upd_restart"))
             alert.runModal()
         }
 
@@ -327,7 +327,7 @@ final class Updater {
             DebugLog.write("updater: installer started, quitting")
             NSApplication.shared.terminate(nil)
         } catch {
-            present(title: "Ошибка обновления", text: error.localizedDescription)
+            present(title: L("upd_error"), text: error.localizedDescription)
         }
     }
 
@@ -380,7 +380,7 @@ final class Updater {
         try process.run()
         process.waitUntilExit()
         guard process.terminationStatus == 0 else {
-            throw updateError("Не удалось распаковать обновление.")
+            throw updateError(L("upd_unpack_failed"))
         }
     }
 
