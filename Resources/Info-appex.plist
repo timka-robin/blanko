@@ -4,6 +4,14 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
+	<key>CFBundleDisplayName</key>
+	<string>Blanko</string>
+	<key>CFBundleExecutable</key>
+	<string>BlankoFinder</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.blanko.mac.finder</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
 	<key>CFBundleLocalizations</key>
 	<array>
 		<string>en</string>
@@ -26,26 +34,18 @@
 		<string>nb</string>
 		<string>fi</string>
 	</array>
-	<key>CFBundleDisplayName</key>
-	<string>Blanko</string>
-	<key>CFBundleExecutable</key>
-	<string>BlankoFinder</string>
-	<key>CFBundleIdentifier</key>
-	<string>com.blanko.mac.finder</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
 	<key>CFBundleName</key>
 	<string>BlankoFinder</string>
 	<key>CFBundlePackageType</key>
 	<string>XPC!</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.3.0</string>
+	<string>1.4.0</string>
 	<key>CFBundleSupportedPlatforms</key>
 	<array>
 		<string>MacOSX</string>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>202609270239</string>
+	<string>202610181014</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>13.0</string>
 	<key>LSUIElement</key>
